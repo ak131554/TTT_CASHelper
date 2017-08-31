@@ -11,12 +11,15 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.EditText;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
@@ -54,38 +57,6 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -116,10 +87,83 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
+            final int sectionNumber = getArguments().getInt(ARG_SECTION_NUMBER);
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+            ((TextView) rootView.findViewById(R.id.argumentLabel1)).setText(getString(R.string.angleToTarget));
+            ((TextView) rootView.findViewById(R.id.argumentLabel2)).setText(getString(R.string.distanceToTarget));
+            if (sectionNumber == 1) {
+                ((TextView) rootView.findViewById(R.id.argumentLabel3)).setText(getString(R.string.angleToIP));
+                ((TextView) rootView.findViewById(R.id.argumentLabel4)).setText(getString(R.string.distanceToIP));
+            } else {
+                ((TextView) rootView.findViewById(R.id.argumentLabel3)).setText(getString(R.string.desiredHeading));
+                ((TextView) rootView.findViewById(R.id.argumentLabel4)).setText(getString(R.string.desiredDistance));
+            }
+
+            FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fabClear);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ((EditText) ((ViewGroup) view.getParent()).findViewById(R.id.argument1)).setText("");
+                    ((EditText) ((ViewGroup) view.getParent()).findViewById(R.id.argument2)).setText("");
+                    ((EditText) ((ViewGroup) view.getParent()).findViewById(R.id.argument3)).setText("");
+                    ((EditText) ((ViewGroup) view.getParent()).findViewById(R.id.argument4)).setText("");
+                }
+            });
+
+            fab = (FloatingActionButton) rootView.findViewById(R.id.fabCalculate);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    View.OnClickListener snackBarOnClickListener = new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            return;
+                        }
+                    };
+                    final String argument1String = ((EditText) ((ViewGroup) view.getParent()).findViewById(R.id.argument1)).getText().toString();
+                    final String argument2String = ((EditText) ((ViewGroup) view.getParent()).findViewById(R.id.argument2)).getText().toString();
+                    final String argument3String = ((EditText) ((ViewGroup) view.getParent()).findViewById(R.id.argument3)).getText().toString();
+                    final String argument4String = ((EditText) ((ViewGroup) view.getParent()).findViewById(R.id.argument4)).getText().toString();
+                    if (TextUtils.isEmpty(argument1String) || TextUtils.isEmpty(argument2String) || TextUtils.isEmpty(argument3String) || TextUtils.isEmpty(argument4String)) {
+                        Snackbar.make(view, getString(R.string.errorEmptyString), Snackbar.LENGTH_INDEFINITE).setAction(getString(R.string.snackBarCloseAction), snackBarOnClickListener).show();
+                        return;
+                    }
+                    final int argument1 = Integer.parseInt(argument1String);
+                    final int argument2 = Integer.parseInt(argument2String);
+                    final int argument3 = Integer.parseInt(argument3String);
+                    final int argument4 = Integer.parseInt(argument4String);
+                    if (argument1 > 359 || argument3 > 359) {
+                        Snackbar.make(view, getString(R.string.errorAngleTooLarge), Snackbar.LENGTH_INDEFINITE).setAction(getString(R.string.snackBarCloseAction), snackBarOnClickListener).show();
+                        return;
+                    }
+                    final Pair<Integer, Integer> result;
+                    if (sectionNumber == 1) {
+                        result = calculate(argument1, argument2, argument3, argument4);
+                    } else {
+                        result = calculate(argument3 + 180, argument4, argument1 + 180, argument2);
+                    }
+                    Snackbar.make(view, getString(R.string.resultFor9Liner, result.first, result.second, result.second / 1000d), Snackbar.LENGTH_INDEFINITE).setAction(getString(R.string.snackBarCloseAction), snackBarOnClickListener).show();
+                }
+            });
+
             return rootView;
+        }
+
+        private Pair<Integer, Integer> calculate(final int angleToTarget, final int distanceToTarget, final int angleToIP, final int distanceToIP) {
+            final double radToTarget = compassToRad(angleToTarget);
+            final double radToIP = compassToRad(angleToIP);
+            final int distance = (int) Math.round(Math.sqrt(distanceToTarget * distanceToTarget + distanceToIP * distanceToIP - 2 * distanceToTarget * distanceToIP * Math.cos(radToTarget - radToIP)));
+            final int angle = radToCompass(Math.atan2(distanceToTarget * Math.sin(radToTarget) - distanceToIP * Math.sin(radToIP), distanceToTarget * Math.cos(radToTarget) - distanceToIP * Math.cos(radToIP)));
+            return new Pair<>(angle, distance);
+        }
+
+        private double compassToRad(final int degrees) {
+            return -Math.PI / 180 * (degrees - 90);
+        }
+
+        private int radToCompass(final double rad) {
+            int value = (int) Math.round(-180 / Math.PI * rad + 90) % 360;
+            return value < 0 ? value + 360 : value;
         }
     }
 
@@ -142,19 +186,16 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
-            return 3;
+            return 2;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "SECTION 1";
+                    return getString(R.string.tabGivenIP);
                 case 1:
-                    return "SECTION 2";
-                case 2:
-                    return "SECTION 3";
+                    return getString(R.string.tabDesiredHeading);
             }
             return null;
         }

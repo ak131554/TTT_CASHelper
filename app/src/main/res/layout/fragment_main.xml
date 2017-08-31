@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,8 +10,118 @@
     tools:context="de.tacticalteam.ttt_cashelper.MainActivity$PlaceholderFragment">
 
     <TextView
-        android:id="@+id/section_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:id="@+id/argumentLabel1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/argument1"
+        android:layout_weight="1"
+        android:text="@string/angleToTarget" />
+
+    <EditText
+        android:id="@+id/argument1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_weight="1"
+        android:ems="10"
+        android:inputType="number"
+        tools:ignore="RelativeOverlap" />
+
+    <EditText
+        android:id="@+id/argument2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/argument1"
+        android:layout_marginTop="47dp"
+        android:layout_weight="1"
+        android:ems="10"
+        android:inputType="number" />
+
+    <TextView
+        android:id="@+id/argumentLabel2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/argument2"
+        android:layout_weight="1"
+        android:text="@string/distanceToTarget" />
+
+    <EditText
+        android:id="@+id/argument3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/argument2"
+        android:layout_marginTop="47dp"
+        android:layout_weight="1"
+        android:ems="10"
+        android:inputType="number" />
+
+    <TextView
+        android:id="@+id/argumentLabel3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/argument3"
+        android:layout_weight="1"
+        android:text="@string/angleToIP" />
+
+    <TextView
+        android:id="@+id/argumentLabel4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/argument4"
+        android:layout_weight="1"
+        android:text="@string/distanceToIP" />
+
+    <EditText
+        android:id="@+id/argument4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/argument3"
+        android:layout_marginTop="47dp"
+        android:layout_weight="1"
+        android:ems="10"
+        android:inputType="number" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabClear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/argument4"
+        android:layout_gravity="end|bottom"
+        android:layout_marginEnd="24dp"
+        android:layout_marginRight="24dp"
+        android:layout_marginTop="26dp"
+        android:src="@android:drawable/ic_delete"
+        app:backgroundTint="@color/colorPrimary" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabCalculate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/fabClear"
+        android:layout_gravity="end|bottom"
+        android:layout_marginEnd="29dp"
+        android:layout_marginRight="29dp"
+        android:layout_toLeftOf="@+id/fabClear"
+        android:layout_toStartOf="@+id/fabClear"
+        android:src="@android:drawable/ic_media_play"
+        app:backgroundTint="@color/colorPrimary" />
 
 </RelativeLayout>
